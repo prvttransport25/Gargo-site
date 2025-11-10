@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prvt Transport | Reliable Transport & Haul Solutions</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind for custom colors and Inter font -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#1e3a8a', // Dark Blue for professionalism
+                        'accent-orange': '#f97316', // Bright Orange for CTAs
+                        'bg-light': '#fef3c7', // Light yellow background for contrast
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for subtle visual improvements */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fef3c7; /* bg-light */
+        }
+        /* Style adjustments for date input in webkit browsers */
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 1;
+            cursor: pointer;
+            color: #1e3a8a; /* primary-blue */
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <!-- Quote Modal Structure -->
+    <div id="quote-modal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-75 transition-opacity duration-300 items-center justify-center p-4" aria-modal="true" role="dialog">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl p-6 md:p-8 transform transition-all duration-300 scale-95 opacity-0" id="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-primary-blue">Get Your Instant Quote</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-2 rounded-full transition duration-150">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <p class="text-sm mb-6 text-gray-600">Tell us about your haul and we'll send you an instant estimate.</p>
+
+            <form onsubmit="event.preventDefault(); submitQuoteForm();">
+                <!-- NEW: Full Name -->
+                <div class="mb-4">
+                    <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="fullName" required placeholder="John Doe" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-accent-orange focus:border-accent-orange transition duration-150">
+                </div>
+                <!-- NEW: Phone Number -->
+                <div class="mb-4">
+                    <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                    <input type="tel" id="phoneNumber" required placeholder="(999) 555-1212" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-accent-orange focus:border-accent-orange transition duration-150">
+                </div>
+                
+                <!-- EXISTING: Pickup Location -->
+                <div class="mb-4">
+                    <label for="pickup" class="block text-sm font-medium text-gray-700 mb-1">Pick Up Location (City, State/Zip)</label>
+                    <input type="text" id="pickup" required placeholder="Ex: Los Angeles, CA 90001" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-accent-orange focus:border-accent-orange transition duration-150">
+                </div>
+                <!-- EXISTING: Delivery Location -->
+                <div class="mb-4">
+                    <label for="delivery" class="block text-sm font-medium text-gray-700 mb-1">Delivery Location (City, State/Zip)</label>
+                    <input type="text" id="delivery" required placeholder="Ex: New York, NY 10001" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-accent-orange focus:border-accent-orange transition duration-150">
+                </div>
+                <!-- NEW: Pick Up Date -->
+                <div class="mb-4">
+                    <label for="pickupDate" class="block text-sm font-medium text-gray-700 mb-1">Pick Up Date</label>
+                    <input type="date" id="pickupDate" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-accent-orange focus:border-accent-orange transition duration-150">
+                </div>
+                <!-- MODIFIED: Delivery Type Option (Standard/Rushed) -->
+                <div class="mb-6">
+                    <label for="deliverySpeed" class="block text-sm font-medium text-gray-700 mb-1">Delivery Type Option</label>
+                    <select id="deliverySpeed" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-accent-orange focus:border-accent-orange transition duration-150">
+                        <option value="">Select Delivery Speed...</option>
+                        <option value="Standard">Standard Delivery</option>
+                        <option value="Rushed">Rushed Delivery</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="w-full py-3 px-4 bg-accent-orange text-white font-semibold rounded-lg shadow-lg hover:bg-orange-600 transition duration-300 transform hover:scale-[1.01]">
+                    Submit for Instant Quote
+                </button>
+            </form>
+
+            <!-- Success Message Placeholder -->
+            <div id="quote-success" class="mt-4 hidden bg-green-100 border-l-4 border-green-500 text-green-700 p-3 rounded-lg" role="alert">
+                <p class="font-bold">Quote Submitted!</p>
+                <p>We've received your request. An estimate will be sent to your email shortly.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="text-2xl font-black text-primary-blue tracking-wide">
+                <span class="text-accent-orange">Prvt</span> Transport
+            </div>
+            <!-- CTA Button - Always visible for mobile -->
+            <button onclick="openModal()" class="text-sm font-bold bg-accent-orange text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition duration-300 shadow-md transform hover:-translate-y-0.5">
+                Instant Quote
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative bg-primary-blue text-white overflow-hidden py-16 md:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h1 class="4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight">
+                Your Cargo. Our Commitment.
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 font-light max-w-3xl mx-auto">
+                Reliable, Safe, and On-Time Transport Solutions Across North America.
+            </p>
+            <button onclick="openModal()" class="bg-accent-orange text-white font-extrabold text-lg md:text-xl px-10 py-4 rounded-xl shadow-2xl hover:bg-orange-600 transition duration-300 transform hover:scale-[1.03] animate-pulse">
+                GET AN INSTANT FREE QUOTE
+            </button>
+        </div>
+        <!-- Simple graphic overlay for visual interest -->
+        <div class="absolute inset-0 opacity-10 bg-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><circle cx=\'50\' cy=\'50\' r=\'2\' fill=\'%23ffffff\'/></svg>')"></div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-16 md:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-primary-blue">
+                Our Core Hauling Expertise
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Service 1: Long-Haul Freight -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 border-b-4 border-accent-orange">
+                    <div class="text-4xl text-accent-orange mb-3">
+                        &#x1F69B; <!-- Truck Icon -->
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-primary-blue">Long-Haul Freight</h3>
+                    <p class="text-gray-600 text-base">
+                        Cross-country or border-to-border. We manage the logistics for your full truckload (FTL) needs, ensuring seamless transit over thousands of miles with GPS tracking.
+                    </p>
+                </div>
+
+                <!-- Service 2: Specialized Hauling -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 border-b-4 border-accent-orange">
+                    <div class="text-4xl text-accent-orange mb-3">
+                        &#x2699;&#xFE0F; <!-- Gear Icon -->
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-primary-blue">Specialized Hauling</h3>
+                    <p class="text-gray-600 text-base">
+                        Handling oversized, heavy, or sensitive cargo (like construction equipment or hazardous materials). Our expert team secures the permits and precision equipment required.
+                    </p>
+                </div>
+
+                <!-- Service 3: Regional & Local -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 border-b-4 border-accent-orange">
+                    <div class="text-4xl text-accent-orange mb-3">
+                        &#x1F4CD; <!-- Pin Icon -->
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-primary-blue">Regional & Local Delivery</h3>
+                    <p class="text-gray-600 text-base">
+                        Fast and flexible solutions for regional, local, and last-mile logistics. We offer rapid turnaround services across the entire United States, ensuring no destination is out of reach.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Secondary CTA -->
+            <div class="mt-12 text-center">
+                <a href="#quote-modal" onclick="openModal()" class="inline-flex items-center justify-center bg-primary-blue text-white font-semibold text-lg px-8 py-3 rounded-lg shadow-xl hover:bg-blue-900 transition duration-300">
+                    Start Your Transport Today
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us / Trust Section -->
+    <section class="py-16 md:py-24 bg-bg-light">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-primary-blue">
+                Why Partner with Prvt Transport?
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                <div class="p-4">
+                    <div class="text-5xl text-accent-orange mb-3">&#x2713;</div>
+                    <p class="font-bold text-lg">99.8% On-Time</p>
+                    <p class="text-sm text-gray-600">Unmatched Schedule Adherence</p>
+                </div>
+                <div class="p-4">
+                    <div class="text-5xl text-accent-orange mb-3">&#x1F512;</div>
+                    <p class="font-bold text-lg">Secured Fleet</p>
+                    <p class="text-sm text-gray-600">Real-Time Tracking & Vetting</p>
+                </div>
+                <div class="p-4">
+                    <div class="text-5xl text-accent-orange mb-3">&#x1F4B8;</div>
+                    <p class="font-bold text-lg">Transparent Pricing</p>
+                    <p class="text-sm text-gray-600">No Hidden Fees. Ever.</p>
+                </div>
+                <div class="p-4">
+                    <div class="text-5xl text-accent-orange mb-3">&#x1F4DE;</div>
+                    <p class="font-bold text-lg">24/7 Support</p>
+                    <p class="text-sm text-gray-600">Dedicated Dispatch Team</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="text-3xl font-black text-white tracking-wide mb-4">
+                <span class="text-accent-orange">Prvt</span> Transport
+            </div>
+            <p class="text-sm text-gray-400 mb-4">
+                Specializing in Long-Haul, Specialized, and Regional Freight Transport.
+            </p>
+            <!-- CONTACT SECTION - Stacked -->
+            <div class="text-sm mb-6 flex flex-col items-center space-y-2">
+                <div class="flex space-x-2">
+                    <span class="text-gray-400">Email us:</span>
+                    <a href="mailto:Booking@prvttransport.com" class="text-gray-300 hover:text-accent-orange transition duration-150">Booking@prvttransport.com</a>
+                </div>
+                <div class="flex space-x-2">
+                    <span class="text-gray-400">Phone:</span>
+                    <a href="tel:+19084606880" class="text-gray-300 hover:text-accent-orange transition duration-150">(908) 460-6880</a>
+                </div>
+            </div>
+            <!-- END CONTACT SECTION -->
+            <p class="text-xs text-gray-500 mt-6">
+                &copy; 2025 Prvt Transport. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Modal Functionality -->
+    <script>
+        const modal = document.getElementById('quote-modal');
+        const modalContent = document.getElementById('modal-content');
+        const quoteSuccess = document.getElementById('quote-success');
+
+        function openModal() {
+            quoteSuccess.classList.add('hidden'); // Reset success message
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Animate in
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modalContent.classList.add('scale-100', 'opacity-100');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }
+
+        function closeModal() {
+            // Animate out
+            modal.classList.remove('opacity-100');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        // Close modal when clicking outside the content area
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Simple form submission handler
+        function submitQuoteForm() {
+            // In a real application, you would send this data to a backend API.
+            // For this example, we just simulate success and log the new data points.
+            const fullName = document.getElementById('fullName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const pickup = document.getElementById('pickup').value;
+            const delivery = document.getElementById('delivery').value;
+            const pickupDate = document.getElementById('pickupDate').value;
+            const deliverySpeed = document.getElementById('deliverySpeed').value; // New field
+
+            console.log("--- New Quote Request Submitted ---");
+            console.log(`- Full Name: ${fullName}`);
+            console.log(`- Phone Number: ${phoneNumber}`);
+            console.log(`- Pick Up Location: ${pickup}`);
+            console.log(`- Delivery Location: ${delivery}`);
+            console.log(`- Pick Up Date: ${pickupDate}`);
+            console.log(`- Delivery Type: ${deliverySpeed}`);
+            
+            // Clear form (or just show success)
+            document.getElementById('fullName').value = '';
+            document.getElementById('phoneNumber').value = '';
+            document.getElementById('pickup').value = '';
+            document.getElementById('delivery').value = '';
+            document.getElementById('pickupDate').value = '';
+            document.getElementById('deliverySpeed').value = '';
+
+            // Hide the form and show the success message
+            const form = modalContent.querySelector('form');
+            form.classList.add('hidden');
+            quoteSuccess.classList.remove('hidden');
+
+            // You might choose to automatically close the modal after a few seconds
+            setTimeout(() => {
+                form.classList.remove('hidden'); // Reset form for next attempt
+                quoteSuccess.classList.add('hidden');
+                closeModal();
+            }, 4000); 
+        }
+    </script>
+</body>
+</html>
+
